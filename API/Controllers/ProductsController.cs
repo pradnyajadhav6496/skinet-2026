@@ -3,6 +3,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Core.Interfaces;
+using Core.Specifications;
 
 namespace API.Controllers
 {
@@ -13,7 +14,9 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts(string? brand, string? type, string? sort)
         {
-            return Ok(await repository.ListAllAsync());
+            var spec = new ProductSpecification(brand, type, sort);
+            var products = await repository.ListAsync(spec);
+            return Ok(products);
         }
 
         [HttpGet("{id}")]
@@ -75,13 +78,17 @@ namespace API.Controllers
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetBrands()
         {
-            return Ok();
+            var spec = new BrandListSpecification();
+            var brands = await repository.ListAsync(spec);
+            return Ok(brands);
         }
 
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetTypes()
         {
-            return Ok();
+            var spec = new TypeListSpecification();
+            var types = await repository.ListAsync(spec);
+            return Ok(types);
         }
     }
 }
